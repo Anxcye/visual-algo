@@ -19,17 +19,17 @@ SRC_FILES = $(wildcard $(SRC_DIR)/**/*.cpp) $(SRC_DIR)/main.cpp
 # Object files
 OBJ_FILES = $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SRC_FILES))
 
-# Target executable
-TARGET = $(BUILD_DIR)/project_executable
+# Target
+TARGET = $(BUILD_DIR)/visual_algo
 
 all: $(TARGET)
 
-run: $(TARGET)
+run: $(TARGET) install
 	$(TARGET)
 
 # Build target executable
 $(TARGET): $(OBJ_FILES) $(STATIC_LIBS) $(DYNAMIC_LIBS)
-	$(CXX) $(CXXFLAGS) -o $@ $(OBJ_FILES) $(STATIC_LIBS) -L$(LIB_DIR) -lvisualization -lncurses
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJ_FILES) $(STATIC_LIBS) 
 
 # Build static libraries
 $(LIB_DIR)/libdata_structures.a: $(BUILD_DIR)/data_structures/array.o
@@ -60,4 +60,13 @@ install: $(STATIC_LIBS) $(DYNAMIC_LIBS)
 	install -m 755 $(DYNAMIC_LIBS) /usr/local/lib/
 	ldconfig
 
-.PHONY: all clean install
+# uninstall libraries
+uninstall:
+	rm -f /usr/local/lib/libdata_structures.a
+	rm -f /usr/local/lib/libsorting.a
+	rm -f /usr/local/lib/libutils.a
+	rm -f /usr/local/lib/libvisualization.so
+	ldconfig
+	
+
+.PHONY: all run clean install
