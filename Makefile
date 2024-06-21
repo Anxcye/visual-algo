@@ -1,7 +1,7 @@
 # Compiler and flags
 CXX = g++
+LDFLAGS = -lncurses -lmenu
 CXXFLAGS = -Wall -Wextra -std=c++17 $(shell find $(INCLUDE_DIR) -type d -exec echo -I{} \;)
-LDFLAGS = -lncurses
 
 # Directories
 SRC_DIR = src
@@ -46,7 +46,7 @@ test: $(TEST_TARGET)
 
 # Build target executable
 $(TARGET): $(OBJ_FILES) $(STATIC_LIBS) $(DYNAMIC_LIBS)
-	$(CXX) $(CXXFLAGS) -o $@ $(LDFLAGS) $(OBJ_FILES) $(STATIC_LIBS) 
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJ_FILES) $(STATIC_LIBS) $(LDFLAGS)
 
 # Build static libraries
 $(LIB_DIR)/libdata_structures.a: $(BUILD_DIR)/data_structures/array.o

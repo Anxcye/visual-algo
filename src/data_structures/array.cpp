@@ -26,3 +26,10 @@ void Array::set(int index, int value) {
     }
     data[index] = value;
 }
+
+Array::Array(const Array& other) : size(other.size) {
+    data = new int[size];
+    for (int i = 0; i < size; ++i) {
+        data[i] = other.data[i];
+    }
+}

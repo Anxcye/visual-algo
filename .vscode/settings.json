@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "*.v": "verilog",
+        "*.glsl": "glsl",
+        "*.arb": "json",
+        "*.tcc": "cpp",
+        "string": "cpp",
+        "string_view": "cpp"
+    }
+}

@@ -4,6 +4,6 @@
 #include "array.h"
 #include "visualize.h"
 
-void bubbleSort(Array& array);
+void bubbleSort(Array array);
 
 #endif // BUBBLE_SORT_H

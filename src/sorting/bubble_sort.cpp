@@ -1,7 +1,8 @@
 #include "bubble_sort.h"
 #include "visualize.h"
+#include "ui.h"
 
-void bubbleSort(Array& array) {
+void bubbleSort(Array array) {
     int size = array.getSize();
     for (int i = 0; i < size - 1; ++i) {
         for (int j = 0; j < size - i - 1; ++j) {
@@ -9,7 +10,7 @@ void bubbleSort(Array& array) {
                 int temp = array.get(j);
                 array.set(j, array.get(j + 1));
                 array.set(j + 1, temp);
-                visualize(array);
+                displayArray(array, 100);   
             }
         }
     }

@@ -4,11 +4,13 @@
 class Array {
 public:
     Array(int size);
+    Array(const Array& other);
     ~Array();
 
     int getSize() const;
     int get(int index) const;
     void set(int index, int value);
+
 
 private:
     int* data;

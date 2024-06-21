@@ -334,7 +334,75 @@ TEST(NcursesTest, Initialization) {
 通过上述测试，我们可以看到`ncurses`库成功运行，可以进行下一步的开发。
 
 #### ncurses 可视化
+##### menu
+目标是支持多种排序算法的可视化，首先需要提供一个选择界面，`showMenu`
 
+```cpp
+int showMenu( char*choices[], int n_choices) {
+    ITEM **items;
+    MENU *menu;
+    int i;
+    WINDOW *menu_win;
+
+    clear();
+    bkgd(COLOR_PAIR(1));
+
+
+    items = (ITEM **)calloc(n_choices + 1, sizeof(ITEM *));
+    for (i = 0; i < n_choices; ++i)
+        items[i] = new_item(choices[i], "");
+
+    menu = new_menu(items);
+
+    // Create menu window
+    menu_win = newwin(n_choices + 2, 40, 1, 4);
+    box(menu_win, 0, 0);
+    wbkgd(menu_win, COLOR_PAIR(1));
+    keypad(menu_win, TRUE);
+
+    set_menu_back(menu, COLOR_PAIR(1));
+    set_menu_fore(menu, COLOR_PAIR(1) | A_REVERSE);
+
+    set_menu_win(menu, menu_win);
+    set_menu_sub(menu, derwin(menu_win, n_choices, 38, 1, 1));
+
+    set_menu_mark(menu, "> ");
+
+    mvprintw(LINES - 3, 3, "Select the sorting algorithm:");
+
+    refresh();
+
+    post_menu(menu);
+    wrefresh(menu_win);
+
+    int ch;
+    while ((ch = wgetch(menu_win)) != '\n') {
+        switch (ch) {
+            case KEY_DOWN:
+                menu_driver(menu, REQ_DOWN_ITEM);
+                break;
+            case KEY_UP:
+                menu_driver(menu, REQ_UP_ITEM);
+                break;
+        }
+        wrefresh(menu_win);
+    }
+
+    ITEM *cur_item = current_item(menu);
+    int selected_index = item_index(cur_item);
+
+    unpost_menu(menu);
+    free_menu(menu);
+    for (i = 0; i < n_choices; ++i)
+        free_item(items[i]);
+    delwin(menu_win);
+
+    return selected_index;
+}
+```
+在这个函数中，提供一个选择界面，用户可以通过上下键选择排序算法，按回车键确认选择。
+![img](./image/2.gif)
+##### Array
 
 
 
