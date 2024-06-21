@@ -1,6 +1,7 @@
 # Compiler and flags
 CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++17 $(shell find $(INCLUDE_DIR) -type d -exec echo -I{} \;)
+LDFLAGS = -lncurses
 
 # Directories
 SRC_DIR = src
@@ -16,20 +17,36 @@ DYNAMIC_LIBS = $(LIB_DIR)/libvisualization.so
 # Source files
 SRC_FILES = $(wildcard $(SRC_DIR)/**/*.cpp) $(SRC_DIR)/main.cpp
 
+# Test source files
+TEST_SRC_FILES = $(wildcard $(TEST_DIR)/*.cpp)
+
 # Object files
 OBJ_FILES = $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SRC_FILES))
+TEST_OBJ_FILES = $(patsubst $(TEST_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(TEST_SRC_FILES))
+TEST_OBJ_FILES := $(filter-out $(BUILD_DIR)/main.o, $(OBJ_FILES)) $(TEST_OBJ_FILES)
 
 # Target
 TARGET = $(BUILD_DIR)/visual_algo
+TEST_TARGET = $(BUILD_DIR)/runTests
 
 all: $(TARGET)
 
 run: $(TARGET) install
 	$(TARGET)
 
+$(TEST_TARGET): $(TEST_OBJ_FILES)
+	$(CXX) -o $@ $^ $(LDFLAGS) -lgtest -lgtest_main -pthread
+
+$(BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp
+	mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+test: $(TEST_TARGET)
+	$(TEST_TARGET)
+
 # Build target executable
 $(TARGET): $(OBJ_FILES) $(STATIC_LIBS) $(DYNAMIC_LIBS)
-	$(CXX) $(CXXFLAGS) -o $@ $(OBJ_FILES) $(STATIC_LIBS) 
+	$(CXX) $(CXXFLAGS) -o $@ $(LDFLAGS) $(OBJ_FILES) $(STATIC_LIBS) 
 
 # Build static libraries
 $(LIB_DIR)/libdata_structures.a: $(BUILD_DIR)/data_structures/array.o
@@ -69,4 +86,4 @@ uninstall:
 	ldconfig
 	
 
-.PHONY: all run clean install
+.PHONY: all run clean install test

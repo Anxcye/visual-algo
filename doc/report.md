@@ -265,6 +265,75 @@ clean:
 ![img](./image/1.gif)
 从上述 gif 动图（pdf版本图片不可动，请查看`1.gif`或 `doc/report.md` 报告）可以看到，程序成功运行，实现了冒泡排序的可视化。但是由于没有引入`ncurses`库，因此只能使用`std::cout`来进行简单的可视化。
 ### ncurses 库支持的可视化
+#### 安装 ncurses
+
+`ncurses`库安装比较简单，我从源码编译、构建和安装`ncurses`库。
+
+```bash
+wget https://invisible-island.net/datafiles/release/ncurses.tar.gz
+tar -xzvf ncurses.tar.gz 
+cd ncurses-6.3/
+./configure 
+make
+sudo make install
+```
+#### 安装 Google Test
+接下来，由于需要对`ncurses`库进行测试和学习，我引入了`Google Test`测试框架，因此需要安装`Google Test`。
+```bash
+ git clone https://github.com/google/googletest.git
+ cd googletest
+ mkdir build
+ cd build/
+ cmake ..
+ make
+ sudo make install
+```
+安装好`Google Test`后，需要对`Makefile`进行修改，以便能够通过`make test`来运行测试。我在`Makefile`中添加了这些内容，如下所示：
+
+```makefile
+# Test source files
+TEST_SRC_FILES = $(wildcard $(TEST_DIR)/*.cpp)
+
+TEST_TARGET = $(BUILD_DIR)/runTests
+
+$(TEST_TARGET): $(TEST_OBJ_FILES)
+	$(CXX) -o $@ $^ $(LDFLAGS) -lgtest -lgtest_main -pthread
+
+$(BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp
+	mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+test: $(TEST_TARGET)
+	$(TEST_TARGET)
+
+```
+#### 测试 ncurses 库
+处理完成相关依赖后，即可编写测试代码。先后编写了两个测试代码，一个测试`Gtest`是否成功运行，一个测试`ncurses`库是否成功运行。
+下面是测试`ncurses`库的基本使用，如下所示：
+```cpp
+TEST(NcursesTest, Initialization) {
+    initscr();			
+	printw("Hello World !!!");	
+	refresh();		
+	getch();		
+	endwin();		
+}
+```
+执行`make test`即可运行测试，测试结果如下：
+```bash
+[==========] Running 2 tests from 2 test suites.
+[----------] Global test environment set-up.
+[----------] 1 test from GTest
+[ RUN      ] GTest.Initialization
+[       OK ] GTest.Initialization (0 ms)
+[----------] 1 test from GTest (0 ms total)
+
+[----------] 1 test from NcursesTest
+[ RUN      ] NcursesTest.Initialization
+```
+通过上述测试，我们可以看到`ncurses`库成功运行，可以进行下一步的开发。
+
+#### ncurses 可视化
 
 
 
