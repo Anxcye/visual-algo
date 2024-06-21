@@ -400,9 +400,163 @@ int showMenu( char*choices[], int n_choices) {
     return selected_index;
 }
 ```
-在这个函数中，提供一个选择界面，用户可以通过上下键选择排序算法，按回车键确认选择。
+在这个函数中，提供一个选择界面，用户可以通过上下键选择排序算法，按回车键确认选择。下面这张动图展示了这个选择界面（pdf文件无法展示动图）。
 ![img](./image/2.gif)
 ##### Array
+下一步是把数组内容显示到屏幕上，通过`displayArray`函数实现。
+```cpp
+void displayArray(Array& arr, int delay) {
+
+    int height, width;
+    getmaxyx(stdscr, height, width);
+
+    int sub_height = arr.getSize() * 2 + 1;
+    int sub_width = 70;
+    int start_y = (height - sub_height) / 2;
+    int start_x = (width - sub_width) / 2;
+
+    WINDOW *subwin = newwin(sub_height, sub_width, start_y, start_x);
+    wbkgd(subwin, COLOR_PAIR(3));
+    box(subwin, 0, 0);
+
+    wattr_on(subwin, COLOR_PAIR(3), NULL);
+
+    for (int i = 0; i < arr.getSize(); ++i) {
+        mvwprintw(subwin, i * 2  + 1, 1, "%d", arr.get(i));
+        for (int j = 0; j < arr.get(i); ++j) {
+            mvwaddch(subwin, i * 2 + 1, j + 5, '\u2598' );
+            // mvwaddstr
+        }
+        
+    }
+
+    wattr_off(subwin, COLOR_PAIR(3), NULL);
+
+    refresh();
+    wrefresh(subwin);
+    
+    std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+}
+```
+这个函数将会创建一个新的窗口，为它添加一个美丽的边框，然后将数组内容显示到屏幕上，并在每一次变化后延迟一段时间，以便观察。下面这张动图展示了这个函数的效果（pdf文件无法展示动图）。
+
+![img](./image/3.png)
+
+### 更多排序算法
+这一部分就很简单了，只需要实现更多的排序算法，然后在`main`函数中添加选项即可。
+
+在这里，我选择了五种常见的排序算法
+```cpp
+    char* choices[] = {
+        "Bubble Sort",
+        "Selection Sort",
+        "Insertion Sort",
+        "Quick Sort",
+        "Merge Sort",
+        "Exit"
+    };
+```
+这是一个十分灵活的设计，只需要在`choices`数组中添加排序算法的名字，然后在`main`函数中添加对应的处理即可。十分便于之后的维护。
+
+之后再在`main`函数中添加对应的处理即可，如下所示：
+```cpp
+while (1) {
+    Array arr(array);
+    selected = showMenu(choices, sizeof(choices) / sizeof(char*));
+
+    switch (selected) {
+    case 0:
+        bubbleSort(arr);
+        break;
+    case 1:
+        selectionSort(arr);
+        break;
+    case 2:
+        insertionSort(arr);
+        break;
+    case 3:
+        quickSort(arr);
+        break;
+    case 4:
+        mergeSort(arr);
+        break;
+    default:
+        endUi();
+        return 0;
+        break;
+    }
+    sleep(1);
+}
+```
+### 总结
+现在代码已经完成了，整体使用了`ncurses`库来实现可视化，使用了`Google Test`来进行单元测试，使用了`Makefile`来编译项目，并且同时支持静态库（数据结构、排序算法和工具类）和动态库（可视化）。
+
+现在，可以通过`make`来编译项目，通过`make run`来运行项目(`sudo`)，通过`make test`来运行测试。
+运行效果如下：
+![img](./image/4.gif)
+
+整个项目的结构清晰，易于维护，十分灵活。整体项目结构如下：
+```
+.
+├── Makefile
+├── README.md
+├── build
+│   ├── data_structures
+│   │   └── array.o
+│   ├── main.o
+│   ├── sorting
+│   │   ├── bubble_sort.o
+│   │   └── sort.o
+│   ├── utils
+│   │   └── random_generator.o
+│   ├── visual_algo
+│   └── visualization
+│       ├── ui.o
+│       └── visualize.o
+├── doc
+│   ├── image
+│   │   ├── 1.gif
+│   │   ├── 2.gif
+│   │   └── 3.png
+│   └── report.md
+├── include
+│   ├── data_structures
+│   │   └── array.h
+│   ├── sorting
+│   │   └── sort.h
+│   ├── utils
+│   │   └── random_generator.h
+│   └── visualization
+│       ├── ui.h
+│       └── visualize.h
+├── lib
+│   ├── libdata_structures.a
+│   ├── libsorting.a
+│   ├── libutils.a
+│   └── libvisualization.so
+├── src
+│   ├── data_structures
+│   │   └── array.cpp
+│   ├── main.cpp
+│   ├── sorting
+│   │   └── sort.cpp
+│   ├── utils
+│   │   └── random_generator.cpp
+│   └── visualization
+│       ├── ui.cpp
+│       └── visualize.cpp
+└── test
+    ├── gtest_test.cpp
+    ├── main_test.cpp
+    ├── ncurses_test.cpp
+    └── ui_test.cpp
+```
+
+
+
+
+
+
 
 
 

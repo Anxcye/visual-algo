@@ -89,8 +89,6 @@ int showMenu( char*choices[], int n_choices) {
 
 
 void displayArray(Array& arr, int delay) {
-    // clear();
-    // bkgd(COLOR_PAIR(1));
 
     int height, width;
     getmaxyx(stdscr, height, width);
